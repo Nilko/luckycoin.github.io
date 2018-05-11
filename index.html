@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+	<meta charset="UTF-8">
+
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+	<meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+	<meta http-equiv="Expires" content="Mon, 26 Jul 1997 05:00:00 GMT">
+	<meta http-equiv="Pragma" content="no-cache">
+
+	<title>Lucky Coin</title>	
+	
+</head>    
+<body>	
+<div class="wrapper">	
+	<header>
+		<div class="logo"><img src="img/logo.png" alt=""></div>
+		<div class="rules"><a href="#rules">rules</a></div>
+	</header>
+	<div class="content">		
+		<div class="row">
+			<div class="column column_bet">				
+					<img class="coin_gif" src="img/flip.gif" alt=""><h1>Make your lucky flip</h1>
+					<div class="lvls">
+						<button class="easy active_lvl">Easy money</button> <button class="hard">Hardcore!</button>		
+						<span class="tooltip">Choose the level of difficulty</span>			
+					</div>
+					<div class="coins">
+						<img src="img/dollar.png" alt="">
+						<img src="img/euro.png" class="grayscale" alt="">
+						<span class="tooltip">Choose coin side to bet on</span>
+					</div>				
+					<div>
+						<button data-bet="1" class="bet active_bet" value="0.02">0.02</button>
+						<button data-bet="2" class="bet" value="0.05">0.05</button>
+						<button data-bet="3" class="bet" value="0.10">0.10</button>
+					</div>					
+					<div class="bet_block">
+						<button class="option minus">−</button>
+						<input type="number" disabled="true" class="value">
+						<button class="option plus">+</button>	
+						<span class="tooltip">Your bet</span>			
+						<button class="go">Get money</button>					
+					</div>				
+			</div>			
+			<div class="column column_result">				
+				<div class="result">					
+					<h1>Result</h1>
+					<div class="standart_response">
+						Play, would be great!						
+					</div>
+					<div class="other_response">						
+					</div>
+					<div class="win_response">
+						<h2>You win! :)</h2>
+						<img src="img/win.gif" alt="">					
+					</div>			
+					<div class="lose_response">
+						<h2>You lose! :(</h2>
+						<img src="img/lose.gif_c200" alt="">					
+					</div>								
+				</div>
+			</div>
+			<div class="column column_history">
+				<h1>History</h1>
+				<div class="standart_response_history">					
+					You have never played		
+				</div>
+				<ul>
+					<li><span>Bet</span><span>Result</span></li>
+					<!-- <li><span class="history_bet">0.02</span><span class="history_win">win</span></li> -->					
+				</ul>
+			</div>
+		</div>		
+	</div>
+	<div class="noExtension" style="display: none"> 
+			NOTE: Please install <a style="color: red" target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet">WebExtensionWallet</a>  to play the Lucky Coin
+		</div>
+		<div class="errNetwork" style="display: none">
+			NOTE: Sorry, you use incorrect net
+		</div>
+	<div id="rules" class="mfp-fade mfp-hide">
+		<h1>The rules</h1>	
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempora non quidem ducimus at, sed possimus sapiente asperiores amet architecto similique fugiat iste dicta, incidunt itaque ratione eligendi. Laborum, accusamus, veniam!</p>	
+	</div>
+</div>
+	<script src='lib/jquery-3.3.1.min.js'></script>
+    <script src='lib/nebPay.js'></script>    
+    <script src='lib/jquery.magnific-popup.min.js'></script>    
+	<link rel="stylesheet" href="lib/magnific-popup.css">
+	<link rel="stylesheet" href="lib/main.css">    
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
+
+    <script>
+		window.onload = function(){		
+			var bet_val_load = ($('.active_bet').val());
+ 			$('.value').val(bet_val_load);		
+ 			$('.standart_response').hide();
+	 		$('.standart_response_history').hide();
+	 			
+			if(typeof(webExtensionWallet) === "undefined"){	    
+		        $(".noExtension").show();	  
+		        $(".content").hide();
+		    }else{}		    		  			  	
+ 			// $('.win_response').hide();
+	 		// $('.lose_response').hide();
+	 		// $('.column_history ul').hide();
+	 		
+	 	};	 		 	
+
+
+	    var NebPay = require("nebpay");   
+	    var nebPay = new NebPay();
+		var dappAddress = "n1sXuE6keJ2spuNZTa95f4hoJGWzK2w8TB1";
+
+		$(document).ready(function(){				  
+	        var to = dappAddress;
+	        var value = "0";
+	        var callFunction = "read";
+	        var callArgs = ""; 
+	        nebPay.simulateCall(to, value, callFunction, callArgs, { 
+	            listener: cbSearch
+	        });
+	    })
+
+		function cbSearch(resp) {
+			var result = resp.result;
+			console.log("return of rpc call: " + JSON.stringify(result));			
+			if (result === ''){	            
+				$(".errNetwork").show();	  
+	        	$(".content").hide();
+			}else{	            
+            try{
+                result = JSON.parse(result);                
+    		} catch (err){	                
+            	}
+
+	            if (!!result[0].bet){     	            		            	
+					$.each(result,function(index,value){						
+						if(result[index].result == 'Win'){
+							$('.column_history ul').append('<li><span class="history_bet">' + (result[index].bet/1000000000000000000) + '</span><span class="history_win">' + result[index].result + '</span></li>');
+						} else {
+							$('.column_history ul').append('<li><span class="history_bet">' + (result[index].bet/1000000000000000000) + '</span><span class="history_lose">' + result[index].result + '</span></li>');
+						}
+					}); } else {
+						$('.standart_response_history').show();
+						$('ul').hide();
+					}
+	        	}
+			}
+
+
+
+	 	$('.rules a').magnificPopup({
+			type:'inline',
+			fixedContentPos: true, 
+			mainClass: 'mfp-fade',      
+			showCloseBtn: true,
+			closeOnBgClick: true
+		});					
+
+
+	 	$('.coins img').click(function(){	 		
+ 			if ($(this).hasClass('grayscale')){ 		
+ 				$('.coins img').addClass('grayscale');	 			
+	 			$(this).removeClass('grayscale');
+ 			} else {}
+	 	})
+
+	 	$('.bet').click(function(){
+	 		if ($(this).hasClass('active_bet')){ 		 				
+ 			} else { 				
+	 			$('.bet').removeClass('active_bet');
+	 			$(this).addClass('active_bet');	 			
+	 			var bet_val = ($(this).val());
+	 			$('.value').val(bet_val);
+ 			}	
+	 	})
+
+	 	$('.lvls button').click(function(){
+	 		if ($(this).hasClass('active_lvl')){ 		 				
+ 			} else { 				
+	 			$('.lvls button').removeClass('active_lvl');
+	 			$(this).addClass('active_lvl');	 				 			
+ 			}	
+	 	})
+
+	 	if($('.active_bet').attr('data-bet') == '1'){
+			$('.minus').addClass('disable');			
+ 		}
+ 		if($('.active_bet').attr('data-bet') == '3'){
+			$('.plus').addClass('disable');						
+ 		}
+
+	 	$('.minus').click(function(){	 		
+	 		if($('.active_bet').attr('data-bet') == '1'){
+	 			return;
+	 		};
+	 		if($('.active_bet').attr('data-bet') == '2'){
+	 			$('.active_bet').removeClass('active_bet');
+	 			$('.bet:first-child').addClass('active_bet');		 			
+	 			$('.value').val('0.02');
+	 			return;
+	 		};
+ 			if($('.active_bet').attr('data-bet') == '3'){
+ 				$('.active_bet').removeClass('active_bet');
+ 				$('.bet:nth-child(2)').addClass('active_bet');	
+ 				$('.value').val('0.05');
+ 				return;
+ 			};
+	 	})
+
+	 	$('.plus').click(function(){	 		
+	 		if($('.active_bet').attr('data-bet') == '1'){
+	 			$('.active_bet').removeClass('active_bet');	 			
+	 			$('.bet:nth-child(2)').addClass('active_bet');	 	 			
+	 			$('.value').val('0.05');
+	 			return;
+	 		};
+
+	 		if($('.active_bet').attr('data-bet') == '2'){
+	 			$('.active_bet').removeClass('active_bet');
+	 			$('.plus').addClass('disable');						
+	 			$('.bet:nth-child(3)').addClass('active_bet');	 	 			
+	 			$('.value').val('0.10');
+	 			return;
+	 		};
+
+ 			if($('.active_bet').attr('data-bet') == '3'){ 				
+ 				return;
+ 			};
+	 	})
+
+
+	 	$('.go').click(function(){
+	        var to = dappAddress;
+	        var value = $('.bet_block .value').val();
+	        if($('.easy').hasClass('active_lvl')){
+	        	var callFunction = "play"
+	        } else {
+	        	var callFunction = "playHard"
+	        }	        	
+	        var callArgs = ""
+	        console.log(callArgs)
+	        nebPay.call(to, value, callFunction, callArgs, {   
+	            listener: cbPush
+	        });	       	        
+		});	       
+
+	    function cbPush(resp) {	        
+	        setTimeout(function(){
+			    window.location.reload(true);
+			    console.log("response of push: " + resp);	        
+			},18500);
+	    }
+
+	</script>
+    
+</body>
+
+</html>
+
+
