@@ -6,6 +6,7 @@ body {
 	color: #fff;	
 	position: relative;	
 	min-height: 100vh;	
+	padding-bottom: 30px;
 }
 
 body:before {
