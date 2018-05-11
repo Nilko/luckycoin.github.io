@@ -29,7 +29,7 @@
 					<img class="coin_gif" src="img/flip.gif" alt=""><h1>Make your lucky flip</h1>
 					<div class="lvls">
 						<button class="easy active_lvl">Easy money</button> <button class="hard">Hardcore!</button>		
-						<span class="tooltip">Choose the level of difficulty</span>			
+						<span class="tooltip">Easy money gives you 51% of win! <br>Choose the level of difficulty</span>			
 					</div>
 					<div class="coins">
 						<img src="img/dollar.png" alt="">
@@ -37,9 +37,9 @@
 						<span class="tooltip">Choose coin side to bet on</span>
 					</div>				
 					<div>
-						<button data-bet="1" class="bet active_bet" value="0.02">0.02</button>
-						<button data-bet="2" class="bet" value="0.05">0.05</button>
-						<button data-bet="3" class="bet" value="0.10">0.10</button>
+						<button data-bet="1" class="bet active_bet" value="0.01">0.01</button>
+						<button data-bet="2" class="bet" value="0.025">0.025</button>
+						<button data-bet="3" class="bet" value="0.05">0.05</button>
 					</div>					
 					<div class="bet_block">
 						<button class="option minus">−</button>
@@ -73,8 +73,7 @@
 					You have never played		
 				</div>
 				<ul>
-					<li><span>Bet</span><span>Result</span></li>
-					<!-- <li><span class="history_bet">0.02</span><span class="history_win">win</span></li> -->					
+					<li><span>Bet</span><span>Result</span></li>					
 				</ul>
 			</div>
 		</div>		
@@ -98,24 +97,25 @@
     <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 
     <script>
-		window.onload = function(){					 			
+		window.onload = function(){		
 			if(typeof(webExtensionWallet) === "undefined"){	    
 		        $(".noExtension").show();	  
 		        $(".content").hide();
-		    }else{}		    		  			  	
- 			// $('.win_response').hide();
-	 		// $('.lose_response').hide();
+		    }else{}		    		  			  	 			
 	 		// $('.column_history ul').hide();
 	 		
 	 	};	 		 	
 
-	    var bet_val_load = ($('.active_bet').val());
- 	    $('.value').val(bet_val_load);		
- 	    $('.standart_response').hide();
-	    $('.standart_response_history').hide();
+	 	var bet_val_load = ($('.active_bet').val());
+		$('.value').val(bet_val_load);		
+		// $('.standart_response').hide();
+ 		$('.standart_response_history').hide();
+ 		$('.win_response').hide();
+ 		$('.lose_response').hide();
+
 	    var NebPay = require("nebpay");   
 	    var nebPay = new NebPay();
-		var dappAddress = "n1sXuE6keJ2spuNZTa95f4hoJGWzK2w8TB1";
+		var dappAddress = "n1tECFZGcE4qgBeDkmZoUXr1qkGhGdTi1Wu";
 
 		$(document).ready(function(){				  
 	        var to = dappAddress;
@@ -128,7 +128,7 @@
 	    })
 
 		function cbSearch(resp) {
-			var result = resp.result;
+			var result = resp.result;			
 			console.log("return of rpc call: " + JSON.stringify(result));			
 			if (result === ''){	            
 				$(".errNetwork").show();	  
@@ -139,8 +139,8 @@
     		} catch (err){	                
             	}
 
-	            if (!!result[0].bet){     	            		            	
-					$.each(result,function(index,value){						
+	            if (!!result[0].bet){     	            		                     
+					$.each(result,function(index,value){							
 						if(result[index].result == 'Win'){
 							$('.column_history ul').append('<li><span class="history_bet">' + (result[index].bet/1000000000000000000) + '</span><span class="history_win">' + result[index].result + '</span></li>');
 						} else {
@@ -150,6 +150,29 @@
 						$('.standart_response_history').show();
 						$('ul').hide();
 					}
+
+					var length = result.length; 
+		    		var last_index = (length - 1);
+		    		var time_last = result[last_index].time;
+		    		var ntimeStamp = Math.floor(Date.now() / 1000);
+		    		var time_minus = (ntimeStamp - time_last);			    		
+		    		if(time_minus>60) {
+		    			$('.win_response').hide();
+ 						$('.lose_response').hide();
+ 						$('.standart_response').show();
+		    		} 
+		    		if (result[last_index].result == 'Win' && time_minus<60){
+			    			$('.win_response').show();
+			    			$('.lose_response').hide();
+			    			$('.standart_response').hide();
+			    	} 
+			    	
+			    	if (result[last_index].result == 'Fail' && time_minus<60){
+			    			$('.lose_response').show();
+			    			$('.standart_response').hide();
+			    			$('.win_response').hide();
+			    	}
+		    				    		
 	        	}
 			}
 
@@ -203,13 +226,13 @@
 	 		if($('.active_bet').attr('data-bet') == '2'){
 	 			$('.active_bet').removeClass('active_bet');
 	 			$('.bet:first-child').addClass('active_bet');		 			
-	 			$('.value').val('0.02');
+	 			$('.value').val('0.01');
 	 			return;
 	 		};
  			if($('.active_bet').attr('data-bet') == '3'){
  				$('.active_bet').removeClass('active_bet');
  				$('.bet:nth-child(2)').addClass('active_bet');	
- 				$('.value').val('0.05');
+ 				$('.value').val('0.025');
  				return;
  			};
 	 	})
@@ -218,7 +241,7 @@
 	 		if($('.active_bet').attr('data-bet') == '1'){
 	 			$('.active_bet').removeClass('active_bet');	 			
 	 			$('.bet:nth-child(2)').addClass('active_bet');	 	 			
-	 			$('.value').val('0.05');
+	 			$('.value').val('0.025');
 	 			return;
 	 		};
 
@@ -226,7 +249,7 @@
 	 			$('.active_bet').removeClass('active_bet');
 	 			$('.plus').addClass('disable');						
 	 			$('.bet:nth-child(3)').addClass('active_bet');	 	 			
-	 			$('.value').val('0.10');
+	 			$('.value').val('0.05');
 	 			return;
 	 		};
 
@@ -251,13 +274,11 @@
 	        });	       	        
 		});	       
 
-	    function cbPush(resp) {	        
+	    function cbPush(resp) {	        	    	
 	        setTimeout(function(){
-			    window.location.reload(true);
-			    console.log("response of push: " + resp);	        
-			},18500);
-	    }
-
+			    window.location.reload(true);					      
+			},20000);
+	    }	    
 	</script>
     
 </body>
