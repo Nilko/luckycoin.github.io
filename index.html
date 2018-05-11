@@ -98,12 +98,7 @@
     <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 
     <script>
-		window.onload = function(){		
-			var bet_val_load = ($('.active_bet').val());
- 			$('.value').val(bet_val_load);		
- 			$('.standart_response').hide();
-	 		$('.standart_response_history').hide();
-	 			
+		window.onload = function(){					 			
 			if(typeof(webExtensionWallet) === "undefined"){	    
 		        $(".noExtension").show();	  
 		        $(".content").hide();
@@ -114,7 +109,10 @@
 	 		
 	 	};	 		 	
 
-
+	    var bet_val_load = ($('.active_bet').val());
+ 	    $('.value').val(bet_val_load);		
+ 	    $('.standart_response').hide();
+	    $('.standart_response_history').hide();
 	    var NebPay = require("nebpay");   
 	    var nebPay = new NebPay();
 		var dappAddress = "n1sXuE6keJ2spuNZTa95f4hoJGWzK2w8TB1";
